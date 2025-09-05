@@ -1,0 +1,82 @@
+{
+  "expo": {
+    "name": "InstantChat",
+    "slug": "instantchat",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/2.jpg",
+    "scheme": "instantchat",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "updates": {
+      "enabled": false,
+      "checkAutomatically": "OFF"
+    },
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#007AFF"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan QR codes for connecting to chat sessions."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA"
+      ],
+      "package": "com.anonymous.instantchat"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow InstantChat to access your camera to scan QR codes for connecting to chat sessions."
+        }
+      ],
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow InstantChat to access your camera to scan QR codes."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/2.jpg",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#007AFF"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "firebase": {
+        "apiKey": "AIzaSyCqfM-HwnItUgsFkKrRFkEQ15vpEmXewlg",
+        "authDomain": "instantchat-930dc.firebaseapp.com",
+        "projectId": "instantchat-930dc",
+        "storageBucket": "instantchat-930dc.firebasestorage.app",
+        "messagingSenderId": "456711816204",
+        "appId": "1:456711816204:web:ba39516bb65d404e455a29",
+        "measurementId": "G-EPRVJ2KXRC"
+      }
+    }
+  }
+}
