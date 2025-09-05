@@ -5,14 +5,14 @@ import QRCodeService from '@/services/QRCodeService';
 import { BarcodeScanningResult, CameraView } from 'expo-camera';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 interface QRScannerProps {
@@ -136,34 +136,49 @@ export default function QRScanner({ onConnectionEstablished }: QRScannerProps) {
   if (hasPermission === null) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={[styles.text, { color: colors.text }]}>
-          Checking camera permissions...
-        </Text>
+        <View style={styles.loadingContainer}>
+          <View style={[styles.loadingIcon, { backgroundColor: colors.primary + '15' }]}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+          <Text style={[styles.loadingText, { color: colors.text }]}>
+            Checking camera permissions...
+          </Text>
+        </View>
       </View>
     );
   }
 
   if (hasPermission === false) {
     return (
-      <View style={[styles.permissionContainer, { backgroundColor: colors.background }]}> 
-        <View style={styles.permissionCard}>
-          <Text style={[styles.title, { color: colors.text }]}>Camera Permission</Text>
-          <Text style={[styles.text, { color: colors.text }]}>
-            We need access to your camera to scan QR codes.
+      <View style={[styles.container, { backgroundColor: colors.background }]}> 
+        <View style={styles.permissionContainer}>
+          <View style={[styles.permissionIcon, { backgroundColor: colors.warning + '15' }]}>
+            <Text style={[styles.permissionIconText, { color: colors.warning }]}>📷</Text>
+          </View>
+          <Text style={[styles.permissionTitle, { color: colors.text }]}>
+            Camera Access Required
           </Text>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.primary }]}
-            onPress={requestPermission}
-          >
-            <Text style={styles.buttonText}>Grant Permission</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.manualButton, { borderColor: colors.borderColor }]}
-            onPress={() => setShowManualInput(true)}
-          >
-            <Text style={[styles.manualButtonText, { color: colors.text }]}>Enter Code Manually</Text>
-          </TouchableOpacity>
+          <Text style={[styles.permissionText, { color: colors.text }]}>
+            We need access to your camera to scan QR codes and connect with others
+          </Text>
+          
+          <View style={styles.permissionButtons}>
+            <TouchableOpacity
+              style={[styles.permissionButton, { backgroundColor: colors.primary }]}
+              onPress={requestPermission}
+            >
+              <Text style={styles.permissionButtonIcon}>🔓</Text>
+              <Text style={styles.permissionButtonText}>Grant Permission</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.manualButton, { borderColor: colors.borderColor }]}
+              onPress={() => setShowManualInput(true)}
+            >
+              <Text style={[styles.manualButtonIcon, { color: colors.text }]}>⌨️</Text>
+              <Text style={[styles.manualButtonText, { color: colors.text }]}>Enter Code Manually</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -171,15 +186,43 @@ export default function QRScanner({ onConnectionEstablished }: QRScannerProps) {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>
-        Scan QR Code
-      </Text>
-      
-  <Text style={[styles.subtitle, { color: colors.text }]}>
-        Point your camera at the QR code to connect
-      </Text>
+      {!scanning ? (
+        <View style={styles.scannerSetup}>
+          {/* Hero Section */}
+          <View style={styles.heroSection}>
+            <View style={[styles.scannerIcon, { backgroundColor: colors.primary + '15' }]}>
+              <Text style={[styles.scannerIconText, { color: colors.primary }]}>📱</Text>
+            </View>
+            <Text style={[styles.heroTitle, { color: colors.text }]}>
+              Scan QR Code
+            </Text>
+            <Text style={[styles.heroSubtitle, { color: colors.text }]}>
+              Point your camera at a QR code to join a chat session
+            </Text>
+          </View>
 
-      {scanning ? (
+          {/* Action Buttons */}
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={[styles.scanButton, { backgroundColor: colors.primary }]}
+              onPress={() => { setIsProcessingScan(false); setScanning(true); }}
+            >
+              <Text style={styles.scanButtonIcon}>📷</Text>
+              <Text style={styles.scanButtonText}>Start Scanning</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.manualButton, { borderColor: colors.borderColor }]}
+              onPress={() => setShowManualInput(true)}
+            >
+              <Text style={[styles.manualButtonIcon, { color: colors.text }]}>⌨️</Text>
+              <Text style={[styles.manualButtonText, { color: colors.text }]}>
+                Enter Code Manually
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
         <View style={styles.cameraContainer}>
           <CameraView
             style={styles.camera}
@@ -191,32 +234,17 @@ export default function QRScanner({ onConnectionEstablished }: QRScannerProps) {
           />
           <View style={styles.overlay}>
             <View style={styles.scanArea} />
+            <Text style={[styles.scanInstruction, { color: 'white' }]}>
+              Position QR code within the frame
+            </Text>
           </View>
           
           <TouchableOpacity
-            style={[styles.cancelButton, styles.manualButton, { borderColor: colors.borderColor }]}
+            style={[styles.cancelButton, { backgroundColor: 'rgba(0,0,0,0.7)' }]}
             onPress={() => { setScanning(false); setIsProcessingScan(false); }}
           >
-            <Text style={[styles.cancelButtonText, { color: colors.text }]}>
+            <Text style={[styles.cancelButtonText, { color: 'white' }]}>
               Cancel
-            </Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.primary }]}
-            onPress={() => { setIsProcessingScan(false); setScanning(true); }}
-          >
-            <Text style={styles.buttonText}>Start Scanning</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.manualButton, { borderColor: colors.borderColor }]}
-            onPress={() => setShowManualInput(true)}
-          >
-            <Text style={[styles.manualButtonText, { color: colors.text }]}>
-              Enter Code Manually
             </Text>
           </TouchableOpacity>
         </View>
@@ -231,33 +259,37 @@ export default function QRScanner({ onConnectionEstablished }: QRScannerProps) {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
-              Enter QR Code Data
-            </Text>
+            <View style={styles.modalHeader}>
+              <View style={[styles.modalIcon, { backgroundColor: colors.primary + '15' }]}>
+                <Text style={[styles.modalIconText, { color: colors.primary }]}>⌨️</Text>
+              </View>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
+                Enter QR Code Data
+              </Text>
+              <Text style={[styles.modalSubtitle, { color: colors.text }]}>
+                Paste the QR code data you received
+              </Text>
+            </View>
             
-            <TextInput
-              style={[
-                styles.textInput,
-                {
-                  borderColor: colors.borderColor,
-                  color: colors.text,
-                  backgroundColor: colors.cardBackground
-                }
-              ]}
-              value={manualCode}
-              onChangeText={setManualCode}
-              placeholder="Paste QR code data here..."
-              placeholderTextColor={colors.placeholderText}
-              multiline
-              numberOfLines={4}
-            />
+            <View style={[styles.inputWrapper, { backgroundColor: colors.cardBackground, borderColor: colors.borderColor }]}>
+              <TextInput
+                style={[styles.textInput, { color: colors.text }]}
+                value={manualCode}
+                onChangeText={setManualCode}
+                placeholder="Paste QR code data here..."
+                placeholderTextColor={colors.placeholderText}
+                multiline
+                numberOfLines={4}
+              />
+            </View>
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, { backgroundColor: colors.primary }]}
                 onPress={processManualCode}
               >
-                <Text style={styles.buttonText}>Connect</Text>
+                <Text style={styles.modalButtonIcon}>🔗</Text>
+                <Text style={styles.modalButtonText}>Connect</Text>
               </TouchableOpacity>
               
               <TouchableOpacity
@@ -267,7 +299,7 @@ export default function QRScanner({ onConnectionEstablished }: QRScannerProps) {
                   setManualCode('');
                 }}
               >
-                <Text style={[styles.manualButtonText, { color: colors.text }]}>Cancel</Text>
+                <Text style={[styles.modalButtonText, { color: colors.text }]}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -282,40 +314,40 @@ export default function QRScanner({ onConnectionEstablished }: QRScannerProps) {
         onRequestClose={() => setShowNameInput(false)}
       >
         <View style={[styles.fullscreen, { backgroundColor: colors.background }]}> 
-          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
-              Join Chat Session
-            </Text>
+          <View style={[styles.joinModalContent, { backgroundColor: colors.background }]}>
+            <View style={styles.joinModalHeader}>
+              <View style={[styles.joinModalIcon, { backgroundColor: colors.success + '15' }]}>
+                <Text style={[styles.joinModalIconText, { color: colors.success }]}>👋</Text>
+              </View>
+              <Text style={[styles.joinModalTitle, { color: colors.text }]}>
+                Join Chat Session
+              </Text>
+              <Text style={[styles.joinModalText, { color: colors.text }]}>
+                You're about to join {scannedData?.userName}'s chat session
+              </Text>
+            </View>
             
-            <Text style={[styles.modalText, { color: colors.text }]}>
-              You're about to join {scannedData?.userName}'s chat session.
-            </Text>
-            
-            <Text style={[styles.label, { color: colors.text }]}>
-              Enter your name:
-            </Text>
-            
-            <TextInput
-              style={[
-                styles.textInput,
-                {
-                  borderColor: colors.borderColor,
-                  color: colors.text,
-                  backgroundColor: colors.cardBackground
-                }
-              ]}
-              value={userName}
-              onChangeText={setUserName}
-              placeholder="Your name"
-              placeholderTextColor={colors.placeholderText}
-              maxLength={50}
-              autoCapitalize="words"
-            />
+            <View style={styles.joinInputSection}>
+              <Text style={[styles.joinInputLabel, { color: colors.text }]}>
+                What's your name?
+              </Text>
+              <View style={[styles.joinInputWrapper, { backgroundColor: colors.cardBackground, borderColor: colors.borderColor }]}>
+                <TextInput
+                  style={[styles.joinTextInput, { color: colors.text }]}
+                  value={userName}
+                  onChangeText={setUserName}
+                  placeholder="Enter your name"
+                  placeholderTextColor={colors.placeholderText}
+                  maxLength={50}
+                  autoCapitalize="words"
+                />
+              </View>
+            </View>
 
-            <View style={styles.modalButtons}>
+            <View style={styles.joinModalButtons}>
               <TouchableOpacity
                 style={[
-                  styles.modalButton, 
+                  styles.joinModalButton, 
                   { backgroundColor: colors.primary },
                   isConnecting && styles.disabledButton
                 ]}
@@ -323,14 +355,17 @@ export default function QRScanner({ onConnectionEstablished }: QRScannerProps) {
                 disabled={isConnecting}
               >
                 {isConnecting ? (
-                  <ActivityIndicator color="white" />
+                  <ActivityIndicator color="white" size="small" />
                 ) : (
-                  <Text style={styles.buttonText}>Join Chat</Text>
+                  <>
+                    <Text style={styles.joinModalButtonIcon}>💬</Text>
+                    <Text style={styles.joinModalButtonText}>Join Chat</Text>
+                  </>
                 )}
               </TouchableOpacity>
               
               <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonOutlined, { borderColor: colors.borderColor }]}
+                style={[styles.joinModalButton, styles.joinModalButtonOutlined, { borderColor: colors.borderColor }]}
                 onPress={() => {
                   setShowNameInput(false);
                   setUserName('');
@@ -338,7 +373,7 @@ export default function QRScanner({ onConnectionEstablished }: QRScannerProps) {
                 }}
                 disabled={isConnecting}
               >
-                <Text style={[styles.manualButtonText, { color: colors.text }]}>Cancel</Text>
+                <Text style={[styles.joinModalButtonText, { color: colors.text }]}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -351,70 +386,162 @@ export default function QRScanner({ onConnectionEstablished }: QRScannerProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
   },
+  
+  // Loading State
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  loadingText: {
+    fontSize: 16,
+    textAlign: 'center',
+    opacity: 0.8,
+  },
+  
+  // Permission State
   permissionContainer: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
-  },
-  permissionCard: {
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: 360,
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.08)',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 30,
-    opacity: 0.8,
-  },
-  text: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginVertical: 10,
-  },
-  buttonContainer: {
-    width: '100%',
-    maxWidth: 300,
-    gap: 15,
-  },
-  button: {
-    padding: 15,
-    borderRadius: 8,
     alignItems: 'center',
   },
-  buttonText: {
-  color: '#fffdfdff',
+  permissionIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  permissionIconText: {
+    fontSize: 40,
+  },
+  permissionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  permissionText: {
+    fontSize: 16,
+    textAlign: 'center',
+    opacity: 0.8,
+    lineHeight: 24,
+    marginBottom: 32,
+    paddingHorizontal: 20,
+  },
+  permissionButtons: {
+    width: '100%',
+    maxWidth: 320,
+    gap: 16,
+  },
+  permissionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    gap: 8,
+  },
+  permissionButtonIcon: {
+    fontSize: 18,
+  },
+  permissionButtonText: {
+    color: 'white',
     fontSize: 16,
     fontWeight: '600',
   },
-  manualButton: {
-    padding: 15,
-    borderRadius: 8,
+  
+  // Scanner Setup
+  scannerSetup: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
+  },
+  heroSection: {
+    alignItems: 'center',
+    marginBottom: 48,
+  },
+  scannerIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  scannerIconText: {
+    fontSize: 40,
+  },
+  heroTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  heroSubtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    opacity: 0.8,
+    lineHeight: 24,
+    paddingHorizontal: 20,
+  },
+  actionButtons: {
+    width: '100%',
+    maxWidth: 320,
+    gap: 16,
+  },
+  scanButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    gap: 12,
+  },
+  scanButtonIcon: {
+    fontSize: 20,
+  },
+  scanButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  manualButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    borderWidth: 2,
+    gap: 8,
+  },
+  manualButtonIcon: {
+    fontSize: 16,
   },
   manualButtonText: {
     fontSize: 16,
     fontWeight: '500',
   },
+  
+  // Camera View
   cameraContainer: {
-    width: '100%',
-    height: 400,
-    borderRadius: 15,
+    flex: 1,
+    borderRadius: 20,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -427,101 +554,209 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: 'rgba(0,0,0,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   scanArea: {
-    width: 200,
-    height: 200,
-  borderWidth: 2,
-  borderColor: 'rgba(255,255,255,0.95)',
-  borderRadius: 12,
-  backgroundColor: 'transparent',
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 6 },
-  shadowOpacity: 0.25,
-  shadowRadius: 8,
+    width: 240,
+    height: 240,
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 16,
+    backgroundColor: 'transparent',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+  },
+  scanInstruction: {
+    position: 'absolute',
+    bottom: 60,
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
   cancelButton: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 30,
     alignSelf: 'center',
-  paddingHorizontal: 20,
-  paddingVertical: 10,
-  borderRadius: 20,
-  backgroundColor: 'rgba(255,255,255,0.12)',
-  borderWidth: 1,
-  borderColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
   },
   cancelButtonText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
   },
+  
+  // Modals
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  modalContent: {
+    width: '90%',
+    maxWidth: 400,
+    padding: 24,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalIconText: {
+    fontSize: 30,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    opacity: 0.7,
+  },
+  inputWrapper: {
+    borderRadius: 16,
+    borderWidth: 2,
+    marginBottom: 24,
+    paddingHorizontal: 4,
+  },
+  textInput: {
+    padding: 16,
+    fontSize: 16,
+    borderRadius: 12,
+    textAlignVertical: 'top',
+  },
+  modalButtons: {
+    gap: 12,
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    gap: 8,
+  },
+  modalButtonIcon: {
+    fontSize: 18,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalButtonOutlined: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+  },
+  
+  // Join Modal
   fullscreen: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 24,
   },
-  modalContent: {
-    width: '80%',
+  joinModalContent: {
+    width: '100%',
     maxWidth: 400,
-    padding: 20,
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    padding: 24,
+    borderRadius: 20,
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    textAlign: 'center',
+  joinModalHeader: {
+    alignItems: 'center',
+    marginBottom: 32,
   },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 10,
-    fontWeight: '500',
-  },
-  textInput: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 15,
-    fontSize: 16,
+  joinModalIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 20,
-    textAlignVertical: 'top',
   },
-  modalButtons: {
-    flexDirection: 'column',
-    gap: 10,
+  joinModalIconText: {
+    fontSize: 40,
   },
-  modalButton: {
-    padding: 15,
-    borderRadius: 8,
+  joinModalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  joinModalText: {
+    fontSize: 16,
+    textAlign: 'center',
+    opacity: 0.8,
+    lineHeight: 22,
+  },
+  joinInputSection: {
+    marginBottom: 32,
+  },
+  joinInputLabel: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  joinInputWrapper: {
+    borderRadius: 16,
+    borderWidth: 2,
+    paddingHorizontal: 4,
+  },
+  joinTextInput: {
+    padding: 20,
+    fontSize: 16,
+    borderRadius: 12,
+  },
+  joinModalButtons: {
+    gap: 16,
+  },
+  joinModalButton: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 50,
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    gap: 12,
   },
-  modalButtonOutlined: {
+  joinModalButtonIcon: {
+    fontSize: 20,
+  },
+  joinModalButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  joinModalButtonOutlined: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
+    borderWidth: 2,
   },
   disabledButton: {
     opacity: 0.6,

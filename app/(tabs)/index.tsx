@@ -7,7 +7,6 @@ import QRScanner from '@/components/QRScanner';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Card } from '@/components/ui/Card';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors, DesignTokens } from '@/constants/Colors';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -163,66 +162,93 @@ export default function HomeScreen() {
       default:
         return (
           <View style={[styles.container, { backgroundColor: colors.background }]}>
-            {/* Enhanced Header */}
-            <ThemedView style={styles.header}>
-              <AppLogo size="medium" />
-              <ThemedText 
-                type="small" 
-                variant="muted" 
-                align="center"
-                style={styles.subtitle}
-              >
-                Connect instantly with QR codes
-              </ThemedText>
+            {/* New Hero Section */}
+            <ThemedView style={styles.heroSection}>
+              <View style={styles.heroContent}>
+                <View style={styles.logoContainer}>
+                  <AppLogo size="large" />
+                </View>
+                <ThemedText 
+                  type="h2" 
+                  weight="bold"
+                  style={[styles.heroTitle, { color: colors.text }]}
+                >
+                  Instant Connect
+                </ThemedText>
+                <ThemedText 
+                  type="body" 
+                  variant="muted" 
+                  align="center"
+                  style={styles.heroSubtitle}
+                >
+                  Share, scan, and chat instantly with QR codes
+                </ThemedText>
+              </View>
+              <View style={[styles.heroDecoration, { backgroundColor: colors.primary + '10' }]} />
             </ThemedView>
 
-            {/* Enhanced Menu Container */}
-            <View style={styles.menuContainer}>
-              <View style={styles.gridItem}>
-                <MenuCard
-                title="Generate QR Code"
-                subtitle="Create a QR code for others to scan"
-                icon="qrcode"
-                onPress={() => setAppState('generate')}
-                variant="primary"
-                />
-              </View>
-
-              <View style={styles.gridItem}>
-                <MenuCard
-                title="Scan QR Code"
-                subtitle="Scan QR code to connect"
-                icon="camera"
-                onPress={() => setAppState('scan')}
-                variant="secondary"
-                />
-              </View>
-
-              <View style={styles.gridItemFull}>
-                <MenuCard
-                title="Chat History"
-                subtitle="View your previous conversations"
-                icon="clock"
-                onPress={() => setAppState('history')}
-                variant="outline"
+            {/* New Action Cards Section */}
+            <View style={styles.actionsSection}>
+              <ThemedText 
+                type="h3" 
+                weight="semibold"
+                style={[styles.sectionTitle, { color: colors.text }]}
+              >
+                Quick Actions
+              </ThemedText>
+              
+              <View style={styles.actionCardsContainer}>
+                <View style={styles.primaryActions}>
+                  <ActionCard
+                    title="Generate"
+                    subtitle="Create QR"
+                    icon="qrcode"
+                    onPress={() => setAppState('generate')}
+                    variant="primary"
+                    size="large"
+                  />
+                  <ActionCard
+                    title="Scan"
+                    subtitle="Connect"
+                    icon="camera"
+                    onPress={() => setAppState('scan')}
+                    variant="secondary"
+                    size="large"
+                  />
+                </View>
+                
+                <ActionCard
+                  title="Chat History"
+                  subtitle="View previous conversations"
+                  icon="clock"
+                  onPress={() => setAppState('history')}
+                  variant="outline"
+                  size="full"
                 />
               </View>
             </View>
 
-            {/* Spacer below grid to avoid overlap with toggle */}
-            <View style={{ height: DesignTokens.spacing.xl }} />
-
-            {/* Theme Toggle Section */}
-            <ThemedView style={styles.themeToggleContainer}>
-              <ThemeToggle size="medium" />
-            </ThemedView>
-
-            {/* Footer Info */}
-            <ThemedView style={styles.footer}>
-              <ThemedText type="small" variant="muted" align="center">
-                Secure • Fast • Private
-              </ThemedText>
-            </ThemedView>
+            {/* New Bottom Section */}
+            <View style={styles.bottomSection}>
+              <View style={styles.themeSection}>
+                <ThemeToggle size="large" />
+                <ThemedText 
+                  type="small" 
+                  variant="muted" 
+                  style={styles.themeLabel}
+                >
+                  Theme
+                </ThemedText>
+              </View>
+              
+              <View style={styles.footerInfo}>
+                <View style={styles.featureTags}>
+                  <FeatureTag text="Secure" />
+                  <FeatureTag text="Fast" />
+                  <FeatureTag text="Private" />
+                </View>
+              </View>
+            </View>
           </View>
         );
     }
@@ -275,97 +301,125 @@ export default function HomeScreen() {
   );
 }
 
-interface MenuCardProps {
+interface ActionCardProps {
   title: string;
   subtitle: string;
   icon: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'large' | 'full';
 }
 
-const MenuCard: React.FC<MenuCardProps> = ({ title, subtitle, icon, onPress, variant }) => {
+const ActionCard: React.FC<ActionCardProps> = ({ title, subtitle, icon, onPress, variant, size = 'large' }) => {
   const { theme } = useTheme();
   const colors = Colors[theme];
+  
   const getVariantStyles = () => {
     switch (variant) {
       case 'primary':
         return {
-          backgroundColor: colors.primaryLight,
+          backgroundColor: colors.primary,
           borderColor: colors.primary,
+          shadowColor: colors.primary,
         };
       case 'secondary':
         return {
-          backgroundColor: colors.secondaryLight,
+          backgroundColor: colors.secondary,
           borderColor: colors.secondary,
+          shadowColor: colors.secondary,
         };
       case 'outline':
         return {
           backgroundColor: colors.cardBackground,
           borderColor: colors.borderColor,
+          shadowColor: colors.text,
         };
       default:
         return {
           backgroundColor: colors.cardBackground,
           borderColor: colors.borderColor,
+          shadowColor: colors.text,
         };
+    }
+  };
+
+  const getTextColor = () => {
+    switch (variant) {
+      case 'primary':
+      case 'secondary':
+        return colors.background;
+      default:
+        return colors.text;
     }
   };
 
   const getIconColor = () => {
     switch (variant) {
       case 'primary':
-        return colors.primary;
       case 'secondary':
-        return colors.secondary;
+        return colors.background;
       default:
         return colors.text;
     }
   };
 
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <Card
-        variant="elevated"
-        padding="large"
-        margin="small"
-        borderRadius="large"
-        style={StyleSheet.flatten([
-          styles.menuCard,
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <View
+        style={[
+          styles.actionCard,
+          size === 'full' ? styles.actionCardFull : styles.actionCardLarge,
           getVariantStyles(),
-        ])}
+        ]}
       >
-        <View style={styles.cardContent}>
-          <View style={styles.cardTop}>
-            <View style={[styles.iconContainer, { backgroundColor: getIconColor() + '20' }]}>
-              <IconSymbol 
-                name={icon} 
-                size={28} 
-                color={getIconColor()}
-              />
-            </View>
+        <View style={styles.actionCardContent}>
+          <View style={[styles.actionIconContainer, { backgroundColor: getIconColor() + '20' }]}>
+            <IconSymbol 
+              name={icon} 
+              size={size === 'full' ? 24 : 32} 
+              color={getIconColor()}
+            />
           </View>
-          <View style={styles.cardBottom}>
+          <View style={styles.actionTextContainer}>
             <ThemedText 
-              type="h4" 
-              weight="semibold"
-              style={[
-                styles.cardTitle, 
-                { color: getIconColor() }
-              ]}
+              type={size === 'full' ? 'h4' : 'h3'} 
+              weight="bold"
+              style={[styles.actionTitle, { color: getTextColor() }]}
             >
               {title}
             </ThemedText>
             <ThemedText 
               type="small" 
-              variant="muted"
-              style={styles.cardSubtitle}
+              variant={variant === 'outline' ? 'muted' : undefined}
+              style={[styles.actionSubtitle, { color: getTextColor() }]}
             >
               {subtitle}
             </ThemedText>
           </View>
         </View>
-      </Card>
+      </View>
     </TouchableOpacity>
+  );
+};
+
+interface FeatureTagProps {
+  text: string;
+}
+
+const FeatureTag: React.FC<FeatureTagProps> = ({ text }) => {
+  const { theme } = useTheme();
+  const colors = Colors[theme];
+  
+  return (
+    <View style={[styles.featureTag, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '30' }]}>
+      <ThemedText 
+        type="small" 
+        weight="medium"
+        style={[styles.featureTagText, { color: colors.primary }]}
+      >
+        {text}
+      </ThemedText>
+    </View>
   );
 };
 
@@ -378,87 +432,141 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: DesignTokens.spacing.lg,
   },
-  header: {
-    paddingTop: DesignTokens.spacing.lg,
+  
+  // New Hero Section Styles
+  heroSection: {
+    paddingTop: DesignTokens.spacing.xl,
     paddingHorizontal: DesignTokens.spacing.lg,
-    paddingBottom: DesignTokens.spacing.md,
+    paddingBottom: DesignTokens.spacing.xl,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  heroContent: {
     alignItems: 'center',
-    justifyContent: 'center',
+    zIndex: 2,
   },
-  appTitle: {
-    marginTop: DesignTokens.spacing.sm,
-    marginBottom: DesignTokens.spacing.xs,
+  logoContainer: {
+    marginBottom: DesignTokens.spacing.lg,
   },
-  subtitle: {
+  heroTitle: {
+    fontSize: 32,
+    marginBottom: DesignTokens.spacing.sm,
+    textAlign: 'center',
+  },
+  heroSubtitle: {
+    fontSize: 16,
+    lineHeight: 24,
     textAlign: 'center',
     paddingHorizontal: DesignTokens.spacing.md,
-    lineHeight: 24,
   },
-  menuContainer: {
-    flex: 1,
-    paddingHorizontal: DesignTokens.spacing.sm,
-    paddingVertical: DesignTokens.spacing.xs,
-    gap: DesignTokens.spacing.sm,
-    justifyContent: 'flex-start',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  gridItem: {
-    width: '48%',
-  },
-  gridItemFull: {
-    width: '100%',
-    marginBottom: DesignTokens.spacing.sm,
-  },
-  menuCard: {
+  heroDecoration: {
+    position: 'absolute',
+    top: -50,
+    right: -50,
+    width: 200,
     height: 200,
-    borderWidth: 1,
+    borderRadius: 100,
+    opacity: 0.3,
   },
-  cardContent: {
-    flexDirection: 'column',
+  
+  // New Actions Section Styles
+  actionsSection: {
+    flex: 1,
+    paddingHorizontal: DesignTokens.spacing.lg,
+    paddingBottom: DesignTokens.spacing.lg,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    marginBottom: DesignTokens.spacing.lg,
+    textAlign: 'left',
+  },
+  actionCardsContainer: {
+    gap: DesignTokens.spacing.lg,
+  },
+  primaryActions: {
+    flexDirection: 'row',
+    gap: DesignTokens.spacing.md,
+  },
+  
+  // New Action Card Styles
+  actionCard: {
+    borderRadius: DesignTokens.borderRadius.xlarge,
+    borderWidth: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  actionCardLarge: {
+    flex: 1,
+    height: 140,
+  },
+  actionCardFull: {
+    height: 80,
+  },
+  actionCardContent: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: DesignTokens.spacing.sm,
+    padding: DesignTokens.spacing.lg,
+    gap: DesignTokens.spacing.md,
   },
-  cardTop: {
-    alignItems: 'center',
-  },
-  cardBottom: {
-    alignItems: 'center',
-    gap: DesignTokens.spacing.xs,
-    paddingBottom: DesignTokens.spacing.md,
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
+  actionIconContainer: {
+    width: 50,
+    height: 50,
     borderRadius: DesignTokens.borderRadius.large,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  textContainer: {
+  actionTextContainer: {
     flex: 1,
     gap: DesignTokens.spacing.xs,
   },
-  cardTitle: {
-    marginBottom: DesignTokens.spacing.xs,
-    textAlign: 'center',
+  actionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
   },
-  cardSubtitle: {
-    lineHeight: 20,
-    textAlign: 'center',
-    marginBottom: DesignTokens.spacing.md,
+  actionSubtitle: {
+    fontSize: 14,
+    opacity: 0.8,
   },
-  footer: {
-    paddingHorizontal: DesignTokens.spacing.md,
-    paddingBottom: DesignTokens.spacing.md,
+  
+  // New Bottom Section Styles
+  bottomSection: {
+    paddingHorizontal: DesignTokens.spacing.lg,
+    paddingBottom: DesignTokens.spacing.xl,
+    gap: DesignTokens.spacing.lg,
+  },
+  themeSection: {
+    alignItems: 'center',
+    gap: DesignTokens.spacing.sm,
+  },
+  themeLabel: {
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  footerInfo: {
     alignItems: 'center',
   },
-  themeToggleContainer: {
-    paddingHorizontal: DesignTokens.spacing.md,
-    paddingVertical: DesignTokens.spacing.md,
-    marginTop: DesignTokens.spacing.xl,
-    marginBottom: DesignTokens.spacing.sm,
-    alignItems: 'center',
+  featureTags: {
+    flexDirection: 'row',
+    gap: DesignTokens.spacing.sm,
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
+  featureTag: {
+    paddingHorizontal: DesignTokens.spacing.md,
+    paddingVertical: DesignTokens.spacing.xs,
+    borderRadius: DesignTokens.borderRadius.round,
+    borderWidth: 1,
+  },
+  featureTagText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  
+  // Legacy styles for other screens
   backButton: {
     paddingHorizontal: DesignTokens.spacing.md,
     paddingVertical: DesignTokens.spacing.sm,

@@ -5,14 +5,14 @@ import QRCodeService from '@/services/QRCodeService';
 import * as Clipboard from 'expo-clipboard';
 import React, { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Share,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Share,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -136,109 +136,140 @@ Or scan the QR code directly!`;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-  {/* Minimal header to focus on QR */}
-
       {!qrValue ? (
-        <View style={styles.inputContainer}>
-          <Text style={[styles.label, { color: colors.text, textAlign: 'center'}]}>
-            Enter your name:
-          </Text>
-          <TextInput
-            style={[
-              styles.textInput,
-              {
-                borderColor: colors.borderColor,
-                color: colors.text,
-                backgroundColor: colors.cardBackground
-              }
-            ]}
-            value={userName}
-            onChangeText={setUserName}
-            placeholder="Your name"
-            placeholderTextColor={colors.placeholderText}
-            maxLength={50}
-            autoCapitalize="words"
-          />
+        <View style={styles.setupContainer}>
+          {/* Hero Section */}
+          <View style={styles.heroSection}>
+            <View style={[styles.iconContainer, { backgroundColor: colors.primary + '15' }]}>
+              <Text style={[styles.heroIcon, { color: colors.primary }]}>📱</Text>
+            </View>
+            <Text style={[styles.heroTitle, { color: colors.text }]}>
+              Create QR Code
+            </Text>
+            <Text style={[styles.heroSubtitle, { color: colors.text }]}>
+              Generate a QR code for others to scan and join your chat
+            </Text>
+          </View>
 
-          <TouchableOpacity
-            style={[
-              styles.generateButton,
-              { backgroundColor: colors.primary },
-              isGenerating && styles.disabledButton
-            ]}
-            onPress={generateQRCode}
-            disabled={isGenerating}
-          >
-            {isGenerating ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.buttonText}>Generate QR Code</Text>
-            )}
-          </TouchableOpacity>
+          {/* Input Section */}
+          <View style={styles.inputSection}>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>
+              What's your name?
+            </Text>
+            <View style={[styles.inputWrapper, { backgroundColor: colors.cardBackground, borderColor: colors.borderColor }]}>
+              <TextInput
+                style={[styles.textInput, { color: colors.text }]}
+                value={userName}
+                onChangeText={setUserName}
+                placeholder="Enter your name"
+                placeholderTextColor={colors.placeholderText}
+                maxLength={50}
+                autoCapitalize="words"
+              />
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.generateButton,
+                { backgroundColor: colors.primary },
+                isGenerating && styles.disabledButton
+              ]}
+              onPress={generateQRCode}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <ActivityIndicator color="white" size="small" />
+              ) : (
+                <>
+                  <Text style={styles.buttonIcon}>🚀</Text>
+                  <Text style={styles.buttonText}>Generate QR Code</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       ) : (
         <View style={styles.qrContainer}>
-      <View style={[styles.qrCodeWrapper, { backgroundColor: colors.cardBackground }]}>
-            <QRCode
-              value={qrValue}
-        size={240}
-              color={colors.text}
-              backgroundColor={colors.cardBackground}
-            />
+          {/* QR Display Section */}
+          <View style={styles.qrDisplaySection}>
+            <View style={[styles.qrCodeWrapper, { backgroundColor: colors.cardBackground }]}>
+              <QRCode
+                value={qrValue}
+                size={200}
+                color={colors.text}
+                backgroundColor={colors.cardBackground}
+              />
+            </View>
+            <Text style={[styles.qrTitle, { color: colors.text }]}>
+              Your QR Code is Ready!
+            </Text>
+            <Text style={[styles.qrSubtitle, { color: colors.text }]}>
+              Share this code with friends to start chatting
+            </Text>
           </View>
-      {/* Removed instruction text for cleaner UI */}
 
-          <View style={styles.buttonContainer}>
-            {/* Primary action to proceed when ready */}
-    <TouchableOpacity
-              style={[styles.shareButton, { backgroundColor: colors.primary }]}
-              onPress={() => {
-                if (generatedSessionId) {
-                  // For the host, the participant name is unknown until the joiner arrives.
-                  onConnectionEstablished(generatedSessionId);
-                }
-              }}
-            >
-              <Text style={styles.buttonText}>✅ Open Chat</Text>
-            </TouchableOpacity>
+          {/* Action Buttons */}
+          <View style={styles.actionButtonsContainer}>
+            <View style={styles.primaryActions}>
+              <TouchableOpacity
+                style={[styles.primaryButton, { backgroundColor: colors.primary }]}
+                onPress={() => {
+                  if (generatedSessionId) {
+                    onConnectionEstablished(generatedSessionId);
+                  }
+                }}
+              >
+                <Text style={styles.primaryButtonIcon}>💬</Text>
+                <Text style={styles.primaryButtonText}>Open Chat</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.primaryButton, { backgroundColor: colors.secondary }]}
+                onPress={() => shareQRCode(qrValue)}
+              >
+                <Text style={styles.primaryButtonIcon}>📤</Text>
+                <Text style={styles.primaryButtonText}>Share</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.secondaryActions}>
+              <TouchableOpacity
+                style={[styles.secondaryButton, { borderColor: colors.borderColor }]}
+                onPress={() => copyToClipboard(qrValue)}
+              >
+                <Text style={[styles.secondaryButtonIcon, { color: colors.text }]}>📋</Text>
+                <Text style={[styles.secondaryButtonText, { color: colors.text }]}>Copy Code</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.secondaryButton, { borderColor: colors.borderColor }]}
+                onPress={resetQRCode}
+              >
+                <Text style={[styles.secondaryButtonIcon, { color: colors.text }]}>🔄</Text>
+                <Text style={[styles.secondaryButtonText, { color: colors.text }]}>New Code</Text>
+              </TouchableOpacity>
+            </View>
 
             <TouchableOpacity
-              style={[styles.shareButton, { backgroundColor: colors.primary }]}
-              onPress={() => shareQRCode(qrValue)}
-            >
-              <Text style={styles.buttonText}>📤 Share Invitation</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.copyButton,{ borderColor: colors.borderColor }]}
-              onPress={() => copyToClipboard(qrValue)}
-            >
-              <Text style={[styles.copyText, { color: colors.text }]}>📋 Copy Code</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.resetButton, { borderColor: colors.borderColor }]}
-              onPress={resetQRCode}
-            >
-              <Text style={[styles.resetButtonText, { color: colors.text }]}>🔄 Generate New</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.disconnectButton, { borderColor: colors.danger }]}
+              style={[styles.dangerButton, { borderColor: colors.danger }]}
               onPress={handleDisconnect}
             >
-              <Text style={[styles.disconnectButtonText, { color: colors.danger }]}>❌ Disconnect</Text>
+              <Text style={[styles.dangerButtonIcon, { color: colors.danger }]}>❌</Text>
+              <Text style={[styles.dangerButtonText, { color: colors.danger }]}>Disconnect</Text>
             </TouchableOpacity>
           </View>
 
-      {isWaitingForConnection && (
-            <View style={styles.waitingContainer}>
+          {/* Status Indicator */}
+          {isWaitingForConnection && (
+            <View style={[styles.statusContainer, { backgroundColor: colors.success + '10', borderColor: colors.success + '30' }]}>
               <ActivityIndicator 
                 size="small" 
-                color={colors.primary} 
-                style={styles.waitingSpinner}
+                color={colors.success} 
+                style={styles.statusSpinner}
               />
-              <Text style={[styles.waitingText, { color: colors.text }]}>QR is active. Ask your friend to scan, then tap "Open Chat".</Text>
+              <Text style={[styles.statusText, { color: colors.success }]}>
+                QR is active. Ask your friend to scan, then tap "Open Chat"
+              </Text>
             </View>
           )}
         </View>
@@ -250,128 +281,202 @@ Or scan the QR code directly!`;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 32,
   },
-  title: {
-    fontSize: 24,
+  
+  // Setup Container (Before QR Generation)
+  setupContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heroSection: {
+    alignItems: 'center',
+    marginBottom: 48,
+  },
+  iconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  heroIcon: {
+    fontSize: 40,
+  },
+  heroTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 12,
     textAlign: 'center',
   },
-  subtitle: {
-    display: 'none',
-  },
-  inputContainer: {
-    width: '100%',
-    maxWidth: 300,
-  },
-  label: {
+  heroSubtitle: {
     fontSize: 16,
-    marginBottom: 10,
-    fontWeight: '500',
+    textAlign: 'center',
+    opacity: 0.8,
+    lineHeight: 24,
+    paddingHorizontal: 20,
+  },
+  inputSection: {
+    width: '100%',
+    maxWidth: 320,
+  },
+  inputLabel: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  inputWrapper: {
+    borderRadius: 16,
+    borderWidth: 2,
+    marginBottom: 24,
+    paddingHorizontal: 4,
   },
   textInput: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 15,
+    padding: 20,
     fontSize: 16,
-    marginBottom: 20,
+    borderRadius: 12,
   },
   generateButton: {
-    padding: 15,
-    borderRadius: 8,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 50,
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    gap: 12,
   },
   disabledButton: {
     opacity: 0.6,
   },
+  buttonIcon: {
+    fontSize: 20,
+  },
   buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  
+  // QR Container (After QR Generation)
+  qrContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  qrDisplaySection: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  qrCodeWrapper: {
+    padding: 24,
+    borderRadius: 24,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+    marginBottom: 24,
+  },
+  qrTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  qrSubtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    opacity: 0.7,
+    lineHeight: 22,
+  },
+  
+  // Action Buttons
+  actionButtonsContainer: {
+    width: '100%',
+    maxWidth: 320,
+    gap: 16,
+  },
+  primaryActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  primaryButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    gap: 8,
+  },
+  primaryButtonIcon: {
+    fontSize: 18,
+  },
+  primaryButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
   },
-  qrContainer: {
-    alignItems: 'center',
-    width: '100%',
-  },
-  qrCodeWrapper: {
-  padding: 20,
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    marginBottom: 12,
-  },
-  instructions: { display: 'none' },
-  buttonContainer: {
-    flexDirection: 'column',
+  secondaryActions: {
+    flexDirection: 'row',
     gap: 12,
-    width: '100%',
-    maxWidth: 300,
   },
-  shareButton: {
-    padding: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 48,
-  },
-  copyButton: {
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    borderWidth: 1,
-    justifyContent: 'center',
-  },
-  resetButton: {
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    borderWidth: 1,
-    justifyContent: 'center',
-  },
-  resetButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  disconnectButton: {
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    borderWidth: 1,
-    justifyContent: 'center',
-  },
-  disconnectButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  copyText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  waitingContainer: {
+  secondaryButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
-    padding: 15,
-    borderRadius: 8,
-    backgroundColor: 'rgba(0, 255, 0, 0.1)',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    gap: 6,
   },
-  waitingSpinner: {
-    marginRight: 10,
+  secondaryButtonIcon: {
+    fontSize: 16,
   },
-  waitingText: {
+  secondaryButtonText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  dangerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    gap: 6,
+  },
+  dangerButtonIcon: {
+    fontSize: 16,
+  },
+  dangerButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  
+  // Status Indicator
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginTop: 16,
+  },
+  statusSpinner: {
+    marginRight: 12,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '500',
+    flex: 1,
   },
 });
